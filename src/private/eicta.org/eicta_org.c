@@ -24,6 +24,7 @@ static PRIV_DESCR_ID_FUNC pdescriptors[] = {
 	{ 0x84, DVB_SI,   descriptor_PRIVATE_EictaORG_PreferredNameListDescriptor },
 	{ 0x85, DVB_SI,   descriptor_PRIVATE_EictaORG_PreferredNameIdentifierDescriptor },
 	{ 0x86, DVB_SI,   descriptor_PRIVATE_EictaORG_EacemStreamIdentifierDescriptor },
+	{ 0x88, DVB_SI,   descriptor_PRIVATE_EictaORG_HDSimulcastLogicalChannelDescriptor },
 	{ 0x00,	0,        NULL } // end of table  (id = 0x00, funct = NULL)
 };
 

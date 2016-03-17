@@ -21,5 +21,6 @@ void descriptor_PRIVATE_EictaORG_LogicalChannelDescriptor (u_char *b);
 void descriptor_PRIVATE_EictaORG_PreferredNameListDescriptor (u_char *b);
 void descriptor_PRIVATE_EictaORG_PreferredNameIdentifierDescriptor (u_char *b);
 void descriptor_PRIVATE_EictaORG_EacemStreamIdentifierDescriptor (u_char *b);
+void descriptor_PRIVATE_EictaORG_HDSimulcastLogicalChannelDescriptor (u_char *b);
 
 #endif
