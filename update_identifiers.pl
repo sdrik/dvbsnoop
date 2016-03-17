@@ -4,6 +4,7 @@ use strict;
 use HTML::Entities qw(decode_entities);
 use HTML::TableExtract;
 require HTTP::Request;
+require HTTP::Cookies;
 require LWP::UserAgent;
 
 sub trim {
@@ -24,9 +25,16 @@ sub trim {
 
 sub fetch {
 	my $type = shift;
-	my $req = HTTP::Request->new(GET => "http://www.dvb.org/products_registration/dvb_identifiers/identifiers.xml?type=" . $type);
+	#my $req = HTTP::Request->new(GET => "http://www.dvb.org/products_registration/dvb_identifiers/identifiers.xml?type=" . $type);
+	my $req = HTTP::Request->new(GET => "http://www.dvbservices.com/identifiers/" . $type . "?command=set_limit&data_per_page=100000");
 	#my $req = HTTP::Request->new(GET => "file:" . $type . ".html");
-	my $ua = LWP::UserAgent->new;
+	my $cookie_jar = HTTP::Cookies->new( 
+		file => 'lwp_cookies.txt',
+		autosave => 1,
+	);
+	my $ua = LWP::UserAgent->new(
+		cookie_jar => $cookie_jar,
+	);
 	my $rsp = $ua->request($req);
 	die $rsp->status_line unless ($rsp->is_success);
 	return decode_entities($rsp->decoded_content);
@@ -35,7 +43,7 @@ sub fetch {
 sub parse_table {
 	my $type = shift;
 	my $page = fetch($type);
-	my $te = HTML::TableExtract->new( headers => [ "ID/Range", @_ ] );
+	my $te = HTML::TableExtract->new( headers => [ "ID / Range", @_ ] );
 	$te->parse($page);
 	# don't know the correct syntax to return the first element
 	foreach my $ts ($te->tables) {
@@ -44,8 +52,9 @@ sub parse_table {
 }
 
 sub update {
+	my $type = shift;
 	my $t = parse_table(@_);
-	open(OUT, ">src/strings/identifiers/" . $_[0] . ".h");
+	open(OUT, ">src/strings/identifiers/" . $type . ".h");
 	binmode(OUT, ":encoding(utf8)");
 	foreach my $row ($t->rows) {
 		my ($id, @fields) = trim @$row;
@@ -77,55 +86,55 @@ sub update {
 }
 
 sub bouquetID {
-	update("bouquetID", "Name", "Country Code", "Operator");
+	update("bouquetID", "bouquet_id", "Bouquet_Name", "Country code", "Bouquet_Operator");
 }
 
 sub caSystemID {
-	update("caSystemID", "CA System specifier");
+	update("caSystemID", "ca_system_id", "CA_System_Specifier");
 }
 
 sub cpSystemID {
-	update("cpSystemID", "CP System specifier");
+	update("cpSystemID", "cp_system_id", "CP_System_Specifier");
 }
 
 sub dataBroadcastID {
-	update("dataBroadcastID", "Data Broqadcast Specification Name");
+	update("dataBroadcastID", "data_broadcast_id", "Data_Broadcast_Specification_Name");
 }
 
 sub networkID {
-	update("networkID", "Description", "Country Code", "Network Type", "Operator");
+	update("networkID", "network_id", "Network_Name", "Country code", "Network type", "Network_Operator");
 }
 
 sub originalNetworkID {
-	update("originalNetworkID", "Description", "Operator");
+	update("originalNetworkID", "original_network_id", "Original_Network_Name", "Original_Network_Operator");
 }
 
 sub privateDataSpecifierID {
-	update("privateDataSpecifierID", "Organisation");
+	update("privateDataSpecifierID", "private_data_spec_id", "Private_Data_Specifier_Organisation");
 }
 
 sub platformID {
-	update("platformID", "Platform Name", "Operator");
+	update("platformID", "platform_id", "Platform_Name", "Platform_Operator");
 }
 
 sub rootOfTrustID {
-	update("rootOfTrustID", "Description", "Operator");
+	update("rootOfTrustID", "root_of_trust_id", "Root_of_Trust_Description", "Root_of_Trust_Operator");
 }
 
 sub mhpOrganisationID {
-	update("mhpOrganisationID", "Organisation Supplying MHP Applications");
+	update("mhpOrganisationID", "mhp_organisation_id", "MHP_Organisation_Operator");
 }
 
 sub mhpApplicationTypeID {
-	update("mhpApplicationTypeID", "Description", "Operator");
+	update("mhpApplicationTypeID", "mhp_app_type_id", "Application_Type_Description", "Application_Type_Operator");
 }
 
 sub mhpAITDescriptors {
-	update("mhpAITDescriptors", "Description", "Operator");
+	update("mhpAITDescriptors", "mhp_ait_descriptor", "AIT_Description", "AIT_Operator");
 }
 
 sub mhpProtocolID {
-	update("mhpProtocolID", "Description");
+	update("mhpProtocolID", "mhp_protocol_id", "MHP_Protocol_Specifier");
 }
 
 # DVB-SI Identifiers
